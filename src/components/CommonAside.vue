@@ -18,16 +18,16 @@
         :index="item.path"
         :key="item.path"
     >
-      <!-- 拼接icon -->
-      <i :class="'el-icon-' + item.icon"></i>
+      <i :class="`el-icon-${item.icon}`"></i>
       <span slot="title">{{ item.label }}</span>
     </el-menu-item>
     <!-- 含子菜单的导航 -->
     <el-submenu v-for="item in hasChildren" :index="item.path" :key="item.path">
       <template slot="title">
-        <i :class="'el-icon-' + item.icon"></i>
+        <i :class="`el-icon-${item.icon}`"></i>
         <span slot="title">{{ item.label }}</span>
       </template>
+      <!-- 子菜单 -->
       <el-menu-item-group
           v-for="(subItem, subIndex) in item.children"
           :key="subItem.path"
@@ -79,16 +79,20 @@ export default {
       this.$store.commit("selectMenu", item);
     },
   },
+  //数据过滤
   computed: {
+    //无子菜单
     noChildren() {
       return this.asyncMenu.filter((item) => !item.children);
     },
+    //有子菜单
     hasChildren() {
       return this.asyncMenu.filter((item) => item.children);
     },
     isCollapse() {
       return this.$store.state.tab.isCollapse;
     },
+    //异步菜单
     asyncMenu() {
       return this.$store.state.tab.menu
     }
