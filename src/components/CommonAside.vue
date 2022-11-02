@@ -32,7 +32,7 @@
           v-for="(subItem, subIndex) in item.children"
           :key="subItem.path"
       >
-        <el-menu-item @click="clickMenu(subItem)" :index="subIndex">
+        <el-menu-item @click="clickMenu(subItem)" :index="subIndex.path">
           {{ subItem.label }}
         </el-menu-item>
       </el-menu-item-group>
