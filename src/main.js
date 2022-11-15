@@ -1,5 +1,15 @@
 import Vue from 'vue'
 import App from './App.vue'
+
+
+import './assets/less/index.less'
+import http from 'axios'
+import '../api/mock.js'
+
+
+import router from '../router'
+import store from '../store'
+
 // 完整引入，将占用体积
 // import ElementUI from 'element-ui'
 // 按需引入，节省体积
@@ -36,16 +46,9 @@ import {
   Pagination,
 } from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import './assets/less/index.less'
-import http from 'axios'
-import '../api/mock.js'
 
+Vue.config.productionTip = false  //关闭警告
 
-import router from '../router'
-import store from '../store'
-
-
-Vue.config.productionTip = false
 Vue.use(Button)
 Vue.use(Radio)
 Vue.use(Container)
@@ -79,6 +82,7 @@ Vue.use(Pagination)
 
 Vue.prototype.$http = http
 
+// 全局路由守卫 前置守卫
 router.beforeEach((to, from, next) => {
   store.commit('getToken')
   const token = store.state.user.token
