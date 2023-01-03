@@ -24,11 +24,11 @@ for (let i = 0; i < count; i++) {
         Mock.mock({
             id: Mock.Random.guid(),
             name: Mock.Random.cname(),
-            addr: Mock.mock('@county(true'),
+            addr: Mock.Random.city(true),
             'age|18-60': 1,
             birth: Mock.Random.date(),
             sex: Mock.Random.integer(0, 1)
-        })
+        })  
     )
 }
 
@@ -40,19 +40,23 @@ export default {
      * @return {{code: number, count: number, data:*[]}}
      */
     getUserList: config => {
-        const { name, page = 1, limit = 20 } = param20bj(config.url)
-        console.log('name:' + name, 'page:' + page, "分页大小limit:" + limit)
+        // console.log('config',config);
+        const { keyword, page = 1, limit = 20 } = param20bj(config.url)
+        // console.log('keyword:' + keyword, 'page:' + page, "分页大小limit:" + limit)
         const mockList = List.filter(user => {
-            if (name && user.name.indexOf(name) === -1 && user.addr.indexOf(name) === -1) return false
+            if (keyword && user.name.indexOf(keyword) === -1 && user.addr.indexOf(keyword) === -1) return false
             return true
         })
         const pageList = mockList.filter((item, index) => index < limit * page && index >= limit * (page - 1))
+        // console.log(mockList);
+        // console.log(pageList);
         return {
             code: 20000,
             count: mockList.length,
             list: pageList
         }
     },
+
     /**
      * 增加用户
      * @param name, addr, age, birth, sex
@@ -60,7 +64,7 @@ export default {
      */
     createUser: config => {
         const { name, addr, age, birth, sex } = JSON.parse(config.body)
-        console.log(JSON.parse(config.body))
+        // console.log('增加用户',JSON.parse(config.body))
         List.unshift({
             id: Mock.Random.guid(),
             name: name,
@@ -76,13 +80,14 @@ export default {
             }
         }
     },
+
     /**
      * 删除用户
      * @param id
      * @return {*}
      */
     deleteUser: config => {
-        const { id } = param20bj(config.url)
+        const {id} = JSON.parse(config.body);
         if (!id) {
             return {
                 code: -999,
@@ -90,12 +95,14 @@ export default {
             }
         } else {
             List = List.filter(u => u.id !== id)
+            console.log(List);
             return {
                 code: 20000,
-                message: '添加成功'
+                message: '删除成功'
             }
         }
     },
+
     /**
      * 批量删除
      * @param config
@@ -112,6 +119,7 @@ export default {
             }
         }
     },
+    
     /**
      * 修改用户
      * @param id, name, addr, age, birth, sex

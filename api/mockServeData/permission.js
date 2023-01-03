@@ -1,3 +1,4 @@
+// mock数据模拟 权限数据
 import Mock from "mockjs"
 export default {
     getMenu: config => {
@@ -14,20 +15,20 @@ export default {
                             name: 'vueHome',
                             label: '首页',
                             icon: 's-home',
-                            url: 'vueHome/vueHome'
+                            url: 'vueHome/vueHome.vue' // 组件路径
                         }, {
                             path: "/mall",
                             name: "vueMall",
                             label: "商品管理",
                             icon: "video-play",
-                            url: "vueMall/vueMall",
+                            url: "vueMall/vueMall.vue",
                         },
                         {
                             path: "/user",
                             name: "vueUser",
                             label: "用户管理",
                             icon: "user",
-                            url: "vueUser/vueUser",
+                            url: "vueUser/vueUser.vue",
                         },
                         {
                             label: "其他",
@@ -38,20 +39,20 @@ export default {
                                     name: "vuePageOne",
                                     label: "页面1",
                                     icon: "setting",
-                                    url: "vueOther/vuePageOne",
+                                    url: "vueOther/vuePageOne.vue",
                                 },
                                 {
                                     path: "/page2",
                                     name: "vuePageTwo",
                                     label: "页面2",
                                     icon: "setting",
-                                    url: "vueOther/vuePageTwo",
+                                    url: "vueOther/vuePageTwo.vue",
                                 },
                             ],
                         },
                     ],
                     token: Mock.Random.guid(),
-                    message: '获取成功'
+                    message: '登录成功'
                 }
             }
         } else if (username === 'xiaoxiao' && password === 'xiaoxiao') {
@@ -64,24 +65,24 @@ export default {
                             name: 'vueHome',
                             label: '首页',
                             icon: 's-home',
-                            url: 'vueHome/vueHome'
+                            url: 'vueHome/vueHome.vue'
                         }, {
                             path: "/mall",
                             name: "vueMall",
                             label: "商品管理",
                             icon: "video-play",
-                            url: "vueMall/vueMall",
+                            url: "vueMall/vueMall.vue",
                         },
                     ],
                     token: Mock.Random.guid(),
-                    message: '获取成功'
+                    message: '登录成功'
                 }
             }
         } else {
             return {
                 code: -999,
                 data: {
-                    message: '密码错误'
+                    message: '用户名与密码不匹配'
                 }
             }
         }

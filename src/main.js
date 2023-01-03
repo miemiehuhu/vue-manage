@@ -10,9 +10,6 @@ import '../api/mock.js'
 import router from '../router'
 import store from '../store'
 
-// 完整引入，将占用体积
-// import ElementUI from 'element-ui'
-// 按需引入，节省体积
 import {
   Button,
   Radio,
@@ -44,8 +41,8 @@ import {
   DatePicker,
   Dialog,
   Pagination,
-} from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
+} from 'element-ui';
+// import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.config.productionTip = false  //关闭警告
 
@@ -82,28 +79,12 @@ Vue.use(Pagination)
 
 Vue.prototype.$http = http
 
-// 全局路由守卫 前置守卫
-router.beforeEach((to, from, next) => {
-  store.commit('getToken')
-  const token = store.state.user.token
-  //若token不存在且当前页不是登录页
-  if (!token && to.name !== 'vueLogin') {
-    next({ name: 'vueLogin' })
-  }
-   else if (token && to.name === 'vueLogin') {
-    next({ name: 'vueHome' })
-  }
-   else {
-    next()
-  }
-})
 
 new Vue({
   store,
   router,
   render: h => h(App),
   created() {
-    store.commit("addMenu", router);
-
+    store.commit("addMenu", router); // 解决页面刷新后白屏的问题
   }
 }).$mount('#app')

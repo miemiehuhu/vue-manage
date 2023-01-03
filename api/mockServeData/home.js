@@ -1,4 +1,4 @@
-// mock数据模拟
+// mock数据模拟 首页数据
 import Mock from 'mockjs'
 
 // 图表数据

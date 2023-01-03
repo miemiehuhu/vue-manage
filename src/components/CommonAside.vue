@@ -1,38 +1,43 @@
 <template>
   <!-- 右侧导航 -->
   <el-menu
-      default-active="1-4-1"
-      class="el-menu-vertical-demo"
-      background-color="#545c64"
-      text-color="#fff"
-      active-text-color="#ffd04b"
-      @open="handleOpen"
-      @close="handleClose"
-      :collapse="isCollapse"
+    class="el-menu-vertical-demo"
+    background-color="#545c64"
+    text-color="#fff"
+    active-text-color="#409EFF"
+    default-active="/home"
+    @open="handleOpen"
+    @close="handleClose"
+    :collapse="isCollapse"
   >
     <h3>{{ isCollapse ? "后台" : "通用后台管理系统" }}</h3>
     <!-- 无子菜单的导航 -->
     <el-menu-item
-        @click="clickMenu(item)"
-        v-for="item in noChildren"
-        :index="item.path"
-        :key="item.path"
+      @click="clickMenu(item)"
+      v-for="item in noChildren"
+      :index="item.path + ''"
+      :key="item.path + ''"
     >
       <i :class="`el-icon-${item.icon}`"></i>
       <span slot="title">{{ item.label }}</span>
     </el-menu-item>
     <!-- 含子菜单的导航 -->
-    <el-submenu v-for="item in hasChildren" :index="item.path" :key="item.path">
+    <el-submenu
+      v-for="item in hasChildren"
+      :index="item.label + ''"
+      :key="item.label + ''"
+    >
       <template slot="title">
         <i :class="`el-icon-${item.icon}`"></i>
         <span slot="title">{{ item.label }}</span>
       </template>
       <!-- 子菜单 -->
       <el-menu-item-group
-          v-for="(subItem, subIndex) in item.children"
-          :key="subItem.path"
+        v-for="subItem in item.children"
+        :index="item.path + ''"
+        :key="subItem.path + ''"
       >
-        <el-menu-item @click="clickMenu(subItem)" :index="subIndex.path">
+        <el-menu-item @click="clickMenu(subItem)" :index="subItem.path">
           {{ subItem.label }}
         </el-menu-item>
       </el-menu-item-group>
@@ -40,25 +45,9 @@
   </el-menu>
 </template>
 
-<style lang="less" scoped>
-.el-menu-vertical-demo:not(.el-menu--collapse) {
-  width: 200px;
-  min-height: 400px;
-}
-
-.el-menu {
-  height: 100%;
-  border: none;
-
-  h3 {
-    color: #fff;
-    text-align: center;
-    line-height: 48px;
-  }
-}
-</style>
-
 <script>
+import Cookie from 'js-cookie';
+
 export default {
   data() {
     return {
@@ -73,10 +62,11 @@ export default {
       console.log(key, keyPath);
     },
     clickMenu(item) {
-      this.$router.push({
-        name: item.name,
-      });
-      this.$store.commit("selectMenu", item);
+      // 当前路由与跳转的路由不一致才允许跳转
+      if (this.$route.path !== item.path && !(this.$route.path === '/home' && item.path === '/')) {
+        this.$router.push({name: item.name});
+        this.$store.commit("selectMenu", item);
+      }
     },
   },
   //数据过滤
@@ -94,8 +84,29 @@ export default {
     },
     //异步菜单
     asyncMenu() {
-      return this.$store.state.tab.menu
-    }
+      // 通过cookie缓存menu数据
+      return JSON.parse(Cookie.get('menu')) || this.$store.state.tab.menu;
+    },
   },
 };
 </script>
+
+<style lang="less" scoped>
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+  width: 180px;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.el-menu {
+  height: 100%;
+  border-right: none;
+
+  h3 {
+    color: #fff;
+    text-align: center;
+    line-height: 48px;
+  }
+
+}
+</style>

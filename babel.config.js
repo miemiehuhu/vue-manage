@@ -1,8 +1,9 @@
 module.exports = {
   presets: [
     '@vue/cli-plugin-babel/preset'
+    ["@babel/preset-env", { "modules": false }]
   ],
-  "plugins": [
+  plugins: [
     [
       "component",
       {
@@ -10,10 +11,5 @@ module.exports = {
         "styleLibraryName": "theme-chalk"
       }
     ]
-  ],
-  env:{
-    development:{
-      plugins: ['dynamic-import-node']
-    }
-  }
+  ]
 }

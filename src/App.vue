@@ -5,7 +5,6 @@
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App'
@@ -13,10 +12,11 @@ export default {
 </script>
 
 <style>
-html, body {
+html, body, h3 ,p {
   margin: 0;
   padding: 0;
 }
+
 #app {
   height: 100vh;
 }

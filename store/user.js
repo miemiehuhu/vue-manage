@@ -1,3 +1,4 @@
+// 管理token相关数据
 import Cookie from 'js-cookie'
 
 export default {

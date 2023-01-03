@@ -3,14 +3,14 @@
     :model="form"
     status-icon
     :rules="rules"
-    ref="form"
+    ref="loginForm"
     label-width="100px"
     class="login-container"
   >
     <h3 class="login_title">系统登录</h3>
     <el-form-item
-      label="用户名"
       label-width="80px"
+      label="用户名"
       prop="username"
       class="username"
     >
@@ -22,12 +22,13 @@
       ></el-input>
     </el-form-item>
     <el-form-item
-      label="密码"
       label-width="80px"
+      label="密码"
       prop="password"
       class="password"
     >
       <el-input
+        show-password
         type="password"
         v-model="form.password"
         autocomplete="off"
@@ -43,8 +44,11 @@
 </template>
 
 <script>
-// import Mock from "mockjs";
-import { getMenu } from "../../api/data";
+/* import Mock from "mockjs";
+import Cookie from "js-cookie"; */
+import { getMenu } from "../../api";
+import { Message } from "element-ui";
+
 export default {
   name: "vueLogin",
   data() {
@@ -65,34 +69,41 @@ export default {
   },
   methods: {
     login() {
-      getMenu(this.form).then(({data:res}) => {
-        console.log(res)
-        if (res.code === 20000) {
-          this.$store.commit("clearMenu");
-          this.$store.commit("setMenu", res.data.menu);
-          this.$store.commit("setToken", res.data.token);
-          this.$store.commit("addMenu", this.$router);
-          this.$router.push({ name: "vueHome" });
-        } else {
-          this.$message.warning(res.data.message);
+      // 校验表单
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          getMenu(this.form).then(({ data }) => {
+            // console.log(data);
+            if (data.code === 20000) {
+              this.$store.commit("clearMenu");
+              this.$store.commit("setMenu", data.data.menu);
+              this.$store.commit("setToken", data.data.token);
+              this.$router.push({ name: "vueHome" });
+              Message.success(data.data.message);
+            } else {
+              Message.error(data.data.message);
+            }
+          });
         }
       });
-      // const token = Mock.random.guid();
-      // this.$store.commit("setToken", token);
-      // this.$router.push({ name: "vueHome" });
+      /*  // token信息
+      const token = Mock.random.guid();  // 随机数模拟token信息
+      // 将token信息存入cookie，用于不同页面间的通信
+      Cookie.set('token',token); */
     },
   },
 };
 </script>
+
 <style lang="less" scoped>
 .login-container {
+  width: 350px;
+  margin: 180px auto;
+  padding: 35px 35px 15px 35px;
+  border: 1px solid #eaeaea;
   border-radius: 15px;
   background-clip: padding-box;
-  margin: 180px auto;
-  width: 350px;
-  padding: 35px 35px 15px 35px;
   background-color: #fff;
-  border: 1px solid #eaeaea;
   box-shadow: 0 0 25px #cac6c6;
 }
 

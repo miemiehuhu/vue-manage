@@ -1,35 +1,37 @@
 <template>
   <div class="manage">
     <el-dialog
-      :title="operateType === 'add' ? '新增用户' : '更新用户'"
-      :visible.sync="isShow"
+      :title="table.dialogType === 0 ? '新增用户' : '更新用户'"
+      :visible.sync="table.isShow"
+      width="60%"
+      :before-close="handleClose"
     >
       <common-form
-        :formLabel="operateFormLabel"
-        :form="operateForm"
+        :formLabel="table.dialogFormLabel"
+        :form="table.dialogForm"
         :inline="true"
-        ref="form"
+        :rules="table.dialogFormRules"
+        ref="userForm"
       ></common-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="isShow = false">取消</el-button>
-        <el-button type="primary" @click="confirm">确定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+        <el-button type="primary" @click="confirm">确 定</el-button>
       </div>
     </el-dialog>
     <div class="manage-header">
-      <el-button type="primary" @click="addUser">+ 新增</el-button>
+      <el-button type="primary" @click="handleAdd">+ 新 增</el-button>
       <common-form
-        :formLabel="formLabel"
-        :form="searchForm"
+        :formLabel="table.searchformLabel"
+        :form="table.searchForm"
         :inline="true"
-        ref="form"
       >
-        <el-button type="primary" @click="getList(searchForm.keyword)">搜索</el-button>
+        <el-button type="primary" @click="handleSearch">搜索</el-button>
       </common-form>
     </div>
     <common-table
-      :tableData="tableData"
-      :tableLabel="tableLabel"
-      :config="config"
+      :tableData="table.tableData"
+      :tableLabel="table.tableLabel"
+      :config="table.tableConfig"
       @changePage="getList()"
       @edit="editUser"
       @del="delUser"
@@ -41,7 +43,7 @@
 <script>
 import CommonForm from "../../src/components/CommonForm.vue";
 import CommonTable from "../../src/components/CommonTable.vue";
-import { getUser } from "../../api/data";
+import { addUser, editUser } from "../../api";
 
 export default {
   name: "vueUser",
@@ -51,21 +53,22 @@ export default {
   },
   data() {
     return {
-      operateType: "add",
+      table: this.$store.state.table,
+      /* operateType: 0, // 0表示新增，1表示更新
       isShow: false,
       operateFormLabel: [
         {
-          model: "name",
+          prop: "name",
           label: "姓名",
           type: "input",
         },
         {
-          model: "age",
+          prop: "age",
           label: "年龄",
           type: "input",
         },
         {
-          model: "sex",
+          prop: "sex",
           label: "性别",
           type: "select",
           opts: [
@@ -80,12 +83,12 @@ export default {
           ],
         },
         {
-          model: "birth",
+          prop: "birth",
           label: "出生日期",
           type: "date",
         },
         {
-          model: "addr",
+          prop: "addr",
           label: "地址",
           type: "input",
         },
@@ -97,12 +100,21 @@ export default {
         birth: "",
         sex: "",
       },
-      formLabel: [{ model: "keyword", label: "", type: "input" }],
+      operateRules: {
+        name: [{ required: true, message: "请输入姓名" }],
+        addr: [{ required: true, message: "请输入地址" }],
+        age: [{ required: true, message: "请输入年龄" }],
+        birth: [{ required: true, message: "请选择出生日期" }],
+        sex: [{ required: true, message: "请选择性别" }],
+      }, */
+      /* // 搜索
+      searchformLabel: [{ model: "keyword", label: "", type: "input" }],
       searchForm: {
         keyword: "",
-      },
-      tableData: [],
-      tableLabel: [
+      }, */
+      // 表格
+      //  tableData: [],
+      /*tableLabel: [
         {
           prop: "name",
           label: "姓名",
@@ -129,29 +141,46 @@ export default {
       config: {
         page: 1,
         total: 30,
-      },
+      }, */
     };
   },
   methods: {
+    // 提交用户表单
     confirm() {
-      if (this.operateType === "edit") {
-        this.$http.post("/user/edit", this.operateForm).then((res) => {
-          this.isShow = false;
-          console.log(res);
-          this.getList();
-        });
-      } else {
-        this.$http.post("/user/add", this.operateForm).then((res) => {
-          this.isShow = false;
-          console.log(res);
-          this.getList();
-        });
-      }
+      this.$refs.userForm.$refs.localForm.validate((valid) => {
+        if (valid) {
+          if (this.table.dialogType === 0) {
+            // 新增数据
+            addUser(this.table.dialogForm).then(() => {
+              // 重新获取列表的接口
+              this.getList();
+            });
+          } else {
+            // 更新数据
+            editUser(this.table.dialogForm).then(() => {
+              this.getList();
+            });
+          }
+          // 清除数据
+          this.$refs.userForm.$refs.localForm.resetFields();
+          //关闭窗口
+          this.table.isShow = false;
+        }
+      });
     },
-    addUser() {
-      this.isShow = true;
-      this.operateType = "add";
-      this.operateForm = {
+    // dialog点击叉叉关闭的时候
+    handleClose() {
+      this.$refs.userForm.$refs.localForm.resetFields();
+      this.table.isShow = false;
+    },
+    // dialog点击取消的时候
+    cancel() {
+      this.handleClose();
+    },
+    handleAdd() {
+      this.table.isShow = true;
+      this.table.dialogType = 0;
+      this.table.dialogForm = {
         name: "",
         addr: "",
         age: "",
@@ -184,21 +213,15 @@ export default {
           });
       });
     },
-    getList(name = "") {
-      this.config.loading = true;
-      name ? (this.config.page = 1) : "";
-      getUser({
-        page: this.config.page,
-        name,
-      }).then(({ data: res }) => {
-        console.log("res", res);
-        this.tableData = res.list.map((item) => {
-          item.sexLabel = item.sex === 0 ? "女" : "男";
-          return item;
-        });
-        this.config.total = res.count;
-        this.config.loading = false;
-      });
+    // 获取列表数据
+    getList() {
+      // 获取用户数据
+      this.$store.dispatch("getLIST");
+    },
+    // 搜索
+    handleSearch() {
+      this.getList();
+      console.log("aaa", this.$store.state.table.searchForm);
     },
   },
   created() {
@@ -206,10 +229,25 @@ export default {
   },
 };
 </script>
+
 <style lang="less" scoped>
-.manage-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.manage {
+  height: 90%;
+  .manage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    /deep/.el-form {
+      &.el-form--inline {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        div.el-form-item {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
 }
 </style>

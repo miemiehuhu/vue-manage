@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <div class="header-container">
     <div class="l-content">
       <el-button
         @click="handleMenu"
@@ -7,10 +7,14 @@
         icon="el-icon-menu"
         size="mini"
       ></el-button>
-      <!-- <h3 style="color: #fff">首页</h3> -->
       <!-- 面包屑 -->
       <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item v-for="item in tags" :key="item.path" :to="{ path: item.path }">{{item.label}}</el-breadcrumb-item>
+        <el-breadcrumb-item
+          v-for="item in tags"
+          :key="item.path"
+          :to="{ path: item.path }"
+          >{{ item.label }}</el-breadcrumb-item
+        >
       </el-breadcrumb>
     </div>
     <div class="r-content">
@@ -24,10 +28,10 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-  </header>
+  </div>
 </template>
 <script>
-import {mapState} from 'vuex'
+import { mapState } from "vuex";
 
 export default {
   name: "CommonHeader",
@@ -40,21 +44,22 @@ export default {
     handleMenu() {
       this.$store.commit("collapseMenu");
     },
-    logOut(){
-      this.$store.commit('clearToken')
-      this.$store.commit('clearMenu')
-      this.$router.push('vueLogin')
-    }
+    logOut() {
+      this.$store.commit("clearToken");
+      this.$store.commit("clearMenu");
+      this.$router.push("vueLogin");
+    },
   },
-  computed:{
+  computed: {
     ...mapState({
-      tags: state => state.tab.tabsList
-    })
+      tags: (state) => state.tab.tabsList,
+    }),
   },
 };
 </script>
+
 <style lang="less" scoped>
-header {
+.header-container {
   display: flex;
   height: 100%;
   justify-content: space-between;
@@ -65,6 +70,20 @@ header {
   align-items: center;
   .el-button {
     margin-right: 20px;
+  }
+  /deep/.el-breadcrumb__item {
+    // 样式穿刺
+    .el-breadcrumb__inner {
+      font-weight: normal;
+      &.is-link {
+        color: #666;
+      }
+    }
+    &:last-child {
+      .el-breadcrumb__inner{
+        color: white;
+      }
+    }
   }
 }
 .r-content {
